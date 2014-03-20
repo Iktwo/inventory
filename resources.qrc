@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file>qml/main.qml</file>
+        <file>qml/LanguageSelector.qml</file>
+        <file>qml/Products.qml</file>
+        <file>qml/ProductDetails.qml</file>
+    </qresource>
+    <qresource prefix="/sql">
+        <file alias="db.sql">resources/data/db.sql</file>
+    </qresource>
+    <qresource prefix="/translations">
+        <file>translation_sp.qm</file>
+        <file alias="mexico">resources/images/mexico.png</file>
+        <file alias="usa">resources/images/usa.png</file>
+    </qresource>
+</RCC>
