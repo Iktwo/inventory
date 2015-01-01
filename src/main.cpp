@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QQuickView>
 #include <QQmlApplicationEngine>
-#include <QQmlEngine>
+#include <QQmlApplicationEngine>
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QSettings>
@@ -14,17 +14,15 @@
 
 int main(int argc, char *argv[])
 {
+    QScopedPointer<QApplication> app(new QApplication(argc, argv));
+
+    QQmlApplicationEngine engine;
+
     QCoreApplication::setOrganizationName("Iktwo Corp.");
     QCoreApplication::setOrganizationDomain("iktwo.com");
     QCoreApplication::setApplicationName("Inventario");
 
-    QScopedPointer<QApplication> app(new QApplication(argc, argv));
-
     qmlRegisterType<Product>();
-
-    QQmlEngine engine;
-
-    QObject::connect(&engine, &QQmlEngine::quit, &QCoreApplication::quit);
 
     TestObject test;
     engine.rootContext()->setContextProperty("test", &test);
@@ -41,17 +39,9 @@ int main(int argc, char *argv[])
     QSettings settings;
     translator.translate(settings.value("language", "SP").toString());
 
-    QQmlComponent component(&engine, QUrl("qrc:/qml/qml/main.qml"));
-    if (!component.isReady())
-        qWarning("%s", qPrintable(component.errorString()));
 
-    QObject *topLevel = component.create();
 
-    QQuickWindow *window = qobject_cast<QQuickWindow *>(topLevel);
-
-    engine.setIncubationController(window->incubationController());
-
-    window->show();
+    engine.load(QUrl("qrc:/qml/qml/main.qml"));
 
     return app->exec();
 }

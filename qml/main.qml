@@ -6,6 +6,7 @@ ApplicationWindow {
 
     width: 1024
     height: 576
+    visible: true
 
     menuBar: MenuBar {
         Menu {
