@@ -4,11 +4,14 @@
 #include <QAbstractListModel>
 #include <QtSql>
 
+#include "notifications.h"
+
 class Product;
 class Products : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(int count READ count NOTIFY countChanged)
+
 public:
     explicit Products(QObject *parent = 0);
     ~Products();
@@ -34,7 +37,7 @@ public:
     void retrieveProducts();
 
 signals:
-    void error(QString error);
+    void showMessage(QString message, Notifications::NotificationType type, Notifications::NotificationDuration duration);
     void countChanged();
 
 protected:

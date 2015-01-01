@@ -4,6 +4,7 @@
         <file>qml/LanguageSelector.qml</file>
         <file>qml/Products.qml</file>
         <file>qml/ProductDetails.qml</file>
+        <file>qml/NotificationBar.qml</file>
     </qresource>
     <qresource prefix="/sql">
         <file alias="db.sql">resources/data/db.sql</file>
@@ -12,5 +13,8 @@
         <file>translation_sp.qm</file>
         <file alias="mexico">resources/images/mexico.png</file>
         <file alias="usa">resources/images/usa.png</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file alias="remove">resources/images/remove.svg</file>
     </qresource>
 </RCC>

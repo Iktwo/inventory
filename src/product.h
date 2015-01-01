@@ -13,6 +13,7 @@ class Product : public QObject
 public:
     Product(const QString &name, QObject *parent = 0);
     Product(int id, const QString &name, QObject *parent = 0);
+    Product(int id, const QString &name, int quantity, QObject *parent = 0);
 
     int id() const;
     QString name() const;

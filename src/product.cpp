@@ -2,7 +2,8 @@
 
 Product::Product(const QString &name, QObject *parent) :
     QObject(parent),
-    mName(name)
+    mName(name),
+    mQuantity(0)
 {
 
 }
@@ -10,8 +11,18 @@ Product::Product(const QString &name, QObject *parent) :
 Product::Product(int id, const QString &name, QObject *parent) :
     QObject(parent),
     mName(name),
-    mId(id)
+    mId(id),
+    mQuantity(0)
 {
+}
+
+Product::Product(int id, const QString &name, int quantity, QObject *parent) :
+    QObject(parent),
+    mName(name),
+    mId(id),
+    mQuantity(quantity)
+{
+
 }
 
 int Product::id() const

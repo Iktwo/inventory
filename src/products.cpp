@@ -4,8 +4,8 @@
 
 #include <QDebug>
 
-#define ERROR_SQL emit error("SQL error in " + QString(Q_FUNC_INFO) + ". Error: " \
-    + sql.lastError().text() + ". Query: "+sql.lastQuery())
+#define ERROR_SQL emit showMessage("SQL error in " + QString(Q_FUNC_INFO) + ". Error: " \
+    + sql.lastError().text() + ". Query: "+sql.lastQuery(), Notifications::Error, Notifications::Infinite)
 
 static const char ConnectionName[] = "inventory_db";
 
@@ -88,12 +88,17 @@ QVariant Products::data(const QModelIndex &index, int role) const
         return QVariant();
 
     Product *product = qobject_cast<Product*>(mProducts[index.row()]);
-    if (role == IdRole)
-        return product->id();
-    else if (role == NameRole)
-        return product->name();
 
-    return QVariant();
+    switch (role) {
+    case IdRole:
+        return product->id();
+    case NameRole:
+        return product->name();
+    case QuantityRole:
+        return product->quantity();
+    default:
+        return QVariant();
+    }
 }
 
 bool Products::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -120,6 +125,7 @@ void Products::addProduct(const QString &name)
 {
     /// TODO: maybe check if product is already in DB ??
     if (name.simplified().isEmpty()) {
+        emit showMessage(tr("Can't add a product with an empty name."), Notifications::Error, Notifications::Long);
         /// Show error in UI
         return;
     }

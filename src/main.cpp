@@ -8,8 +8,9 @@
 
 #include "translator.h"
 
-#include "products.h"
+#include "notifications.h"
 #include "product.h"
+#include "products.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,8 +22,11 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationDomain("iktwo.com");
     QCoreApplication::setApplicationName("Inventario");
 
-    qmlRegisterType<Product>();
+    qRegisterMetaType<Notifications::NotificationType>("Notifications::NotificationType");
+    qRegisterMetaType<Notifications::NotificationDuration>("Notifications::NotificationDuration");
 
+    qmlRegisterType<Product>();
+    qmlRegisterType<Notifications>("Notifications", 1, 0, "Notifications");
 
     Products products;
     engine.rootContext()->setContextProperty("productsModel", &products);
