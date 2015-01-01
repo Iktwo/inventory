@@ -7,7 +7,6 @@
 #include <QSettings>
 
 #include "translator.h"
-#include "testobject.h"
 
 #include "products.h"
 #include "product.h"
@@ -24,8 +23,6 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<Product>();
 
-    TestObject test;
-    engine.rootContext()->setContextProperty("test", &test);
 
     Products products;
     engine.rootContext()->setContextProperty("productsModel", &products);
