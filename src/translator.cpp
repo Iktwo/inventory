@@ -35,10 +35,13 @@ void Translator::setSource(const QString &source)
 
 void Translator::translate(const QString &language)
 {
+    qDebug() << Q_FUNC_INFO << language;
     if (language.toUpper() == "DEFAULT" || language == DefaultLanguage || language.isEmpty())
         removeTranslation();
 
     if (mTranslations.contains(language) && mQtTranslator.load(mTranslations.value(language).toString(), mSource)) {
+        qDebug() << Q_FUNC_INFO << "Translated to: " << language;
+
         QSettings settings;
         settings.setValue("language", language);
         m_app->installTranslator(&mQtTranslator);
