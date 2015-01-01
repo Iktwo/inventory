@@ -8,7 +8,6 @@ ApplicationWindow {
     height: 576
 
     menuBar: MenuBar {
-
         Menu {
             title: qsTr("Products") + translator.tr
 

@@ -46,12 +46,12 @@ Item {
             Label {
                 id: nameLabel
 
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 10
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors {
+                    bottom: parent.bottom; bottomMargin: 10
+                    horizontalCenter: parent.horizontalCenter
+                }
 
                 color: translator.language === model.code ? "white" : "black"
-
                 text: model.name
             }
 
