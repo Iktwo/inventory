@@ -1,10 +1,12 @@
 import QtQuick 2.4
 import QtQuick.Controls 1.3
+import Notifications 1.0
 
 Rectangle {
     id: root
 
     function close() {
+        timerClose.stop()
         labelMessage.text = ""
         height = 0
     }
@@ -13,10 +15,21 @@ Rectangle {
         labelMessage.text = message
         height = 40
         color = notifications.colorForType(type);
+        timerClose.interval = duration
+
+        if (duration === Notifications.Infinite)
+            return
+
+        timerClose.restart()
     }
 
     color: "#3498db"
     Behavior on height { NumberAnimation { easing.type: Easing.InOutCubic } }
+
+    Timer {
+        id: timerClose
+        onTriggered: root.close()
+    }
 
     Label {
         id: labelMessage

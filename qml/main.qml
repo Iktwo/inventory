@@ -3,7 +3,7 @@ import QtQuick.Controls 1.1
 import Notifications 1.0
 
 ApplicationWindow {
-    id: root
+    id: applicationWindow
 
     width: 1024
     height: 576
@@ -15,10 +15,8 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("&Add") + translator.tr
-                shortcut: "ctrl+a";
-                onTriggered: {
-                    productsModel.addProduct("");
-                }
+                shortcut: "ctrl+a"
+                onTriggered: stackView.push(addProductPage)
             }
         }
 
@@ -67,6 +65,7 @@ ApplicationWindow {
             right: parent.right
         }
 
+        focus: true
         initialItem: products
 
         Behavior on y { NumberAnimation { easing.type: Easing.InOutCubic } }
@@ -89,13 +88,16 @@ ApplicationWindow {
 
     Component {
         id: products
-
         Products { }
     }
 
     Component {
-        id: languages
+        id: addProductPage
+        AddProductPage { }
+    }
 
+    Component {
+        id: languages
         LanguageSelector { }
     }
 }

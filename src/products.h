@@ -28,7 +28,7 @@ public:
 
     int count() const;
 
-    Q_INVOKABLE void addProduct(const QString &name);
+    Q_INVOKABLE void addProduct(const QString &name, int id);
     Q_INVOKABLE void removeProduct(int id);
 
     Q_INVOKABLE Product* itemAt(int index);

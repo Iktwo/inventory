@@ -5,6 +5,7 @@
         <file>qml/Products.qml</file>
         <file>qml/ProductDetails.qml</file>
         <file>qml/NotificationBar.qml</file>
+        <file>qml/AddProductPage.qml</file>
     </qresource>
     <qresource prefix="/sql">
         <file alias="db.sql">resources/data/db.sql</file>

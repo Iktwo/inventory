@@ -121,17 +121,16 @@ int Products::count() const
     return rowCount();
 }
 
-void Products::addProduct(const QString &name)
+void Products::addProduct(const QString &name, int id)
 {
     /// TODO: maybe check if product is already in DB ??
     if (name.simplified().isEmpty()) {
         emit showMessage(tr("Can't add a product with an empty name."), Notifications::Error, Notifications::Long);
-        /// Show error in UI
         return;
     }
 
     addProductToDB(name);
-    addProductToModel(new Product(lastProductId(), name));
+    addProductToModel(new Product(id, name));
 }
 
 void Products::removeProduct(int id)
