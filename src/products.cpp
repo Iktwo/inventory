@@ -3,6 +3,8 @@
 #include "product.h"
 
 #include <QDebug>
+#include <QFile>
+#include <QDir>
 
 #define ERROR_SQL emit showMessage("SQL error in " + QString(Q_FUNC_INFO) + ". Error: " \
     + sql.lastError().text() + ". Query: "+sql.lastQuery(), Notifications::Error, Notifications::Infinite)
@@ -17,6 +19,11 @@ Products::Products(QObject *parent) :
 
     initDB();
     retrieveProducts();
+
+    connect(this,
+            SIGNAL(productAddedToDB(int, QString, int, QString)),
+            this,
+            SLOT(addRegisteredProduct(int, QString, int, QString)));
 }
 
 Products::~Products()
@@ -28,6 +35,10 @@ Products::~Products()
 
 void Products::initDB()
 {
+    QDir imagesDir("images");
+    if (!imagesDir.exists())
+        qDebug() << imagesDir.mkpath("images");
+
     if (!mDB.open()) {
         /// TODO: notify UI that there's a problem with DB
         qDebug() << "DB error in " + QString(Q_FUNC_INFO) + ". Error: "+ mDB.lastError().text();
@@ -60,7 +71,7 @@ void Products::initDB()
 
 void Products::retrieveProducts()
 {
-    QString query = QString("SELECT * FROM products ORDER BY name");
+    QString query = QString("SELECT idProduct, name, quantity, image FROM products ORDER BY name");
 
     QSqlQuery sql(QSqlDatabase::database(ConnectionName));
     sql.prepare(query);
@@ -69,7 +80,7 @@ void Products::retrieveProducts()
         ERROR_SQL;
 
     while (sql.next())
-        addProductToModel(new Product(sql.value(0).toInt(), sql.value(1).toString()));
+        addProductToModel(new Product(sql.value(0).toInt(), sql.value(1).toString(), sql.value(2).toInt(), sql.value(3).toString()));
 }
 
 int Products::rowCount(const QModelIndex &parent) const
@@ -96,6 +107,8 @@ QVariant Products::data(const QModelIndex &index, int role) const
         return product->name();
     case QuantityRole:
         return product->quantity();
+    case ImageRole:
+        return product->image();
     default:
         return QVariant();
     }
@@ -111,6 +124,12 @@ bool Products::setData(const QModelIndex &index, const QVariant &value, int role
         setProductName(product->id(), value.toString());
         emit dataChanged(index, index);
         return true;
+    } else if (index.isValid() && role == QuantityRole && !value.toInt() >= 0) {
+        Product *product = qobject_cast<Product*>(mProducts[index.row()]);
+        product->setQuantity(value.toInt());
+        setProductQuantity(product->id(), value.toInt());
+        emit dataChanged(index, index);
+        return true;
     } else {
         return false;
     }
@@ -121,16 +140,33 @@ int Products::count() const
     return rowCount();
 }
 
-void Products::addProduct(const QString &name, int id)
+bool Products::addProduct(int id, const QString &name, int quantity, const QString &image)
 {
     /// TODO: maybe check if product is already in DB ??
     if (name.simplified().isEmpty()) {
         emit showMessage(tr("Can't add a product with an empty name."), Notifications::Error, Notifications::Long);
-        return;
+        return false;
     }
 
-    addProductToDB(name);
-    addProductToModel(new Product(id, name));
+    for (int i = 0; i < mProducts.count(); ++i) {
+        Product *product = qobject_cast<Product*>(mProducts[i]);
+        if (product->id() == id) {
+            emit showMessage(tr("Product id already stored."), Notifications::Error, Notifications::Long);
+            return false;
+        }
+    }
+
+    QString filename = image;
+    QFile fImage(filename.remove("file://"));
+//    QDir imagesDir("images");
+
+    if (fImage.exists()) {
+        qDebug() << "images/" + QString::number(id) + filename.mid(filename.length() - 4);
+        qDebug() << fImage.copy("images/" + QString::number(id) + filename.mid(filename.length() - 4));
+    }
+
+    addProductToDB(id, name, quantity, QString::number(id) + filename.mid(filename.length() - 4));
+    return true;
 }
 
 void Products::removeProduct(int id)
@@ -174,6 +210,7 @@ QHash<int, QByteArray> Products::roleNames() const
     roles[IdRole] = "id";
     roles[NameRole] = "name";
     roles[QuantityRole] = "quantity";
+    roles[ImageRole] = "image";
     return roles;
 }
 
@@ -185,17 +222,22 @@ void Products::addProductToModel(QObject *product)
     emit countChanged();
 }
 
-void Products::addProductToDB(const QString &product)
+void Products::addProductToDB(int id, const QString &name, int quantity, const QString &image)
 {
-    QString query = QString("INSERT INTO products (\"name\") "
-                            "VALUES (:name)");
+    QString query = QString("INSERT INTO products (\"idProduct\", \"name\", \"quantity\", \"image\") "
+                            "VALUES (:id, :name, :quantity, :image)");
 
     QSqlQuery sql(QSqlDatabase::database(ConnectionName));
     sql.prepare(query);
-    sql.bindValue(":name", product);
+    sql.bindValue(":id", id);
+    sql.bindValue(":name", name);
+    sql.bindValue(":quantity", quantity);
+    sql.bindValue(":image", image);
 
     if (!sql.exec())
         ERROR_SQL;
+    else
+        productAddedToDB(id, name, quantity, image);
 }
 
 void Products::removeProductFromDB(int idProduct)
@@ -227,6 +269,27 @@ void Products::setProductName(int idProduct, const QString &name)
         ERROR_SQL;
 }
 
+void Products::setProductQuantity(int idProduct, int quantity)
+{
+    QString query = QString("UPDATE products SET "
+                            "\"quantity\" = :quantity "
+                            "WHERE "
+                            "\"idProduct\" = :idProduct ");
+
+    QSqlQuery sql(QSqlDatabase::database(ConnectionName));
+    sql.prepare(query);
+    sql.bindValue(":idProduct", idProduct);
+    sql.bindValue(":quantity", quantity);
+
+    if (!sql.exec())
+        ERROR_SQL;
+}
+
+void Products::setProductImage(int idProduct, const QString &image)
+{
+
+}
+
 int Products::lastProductId()
 {
     QString query = QString("SELECT max(rowid) from products");
@@ -241,4 +304,9 @@ int Products::lastProductId()
         return sql.value(0).toInt();
 
     return -1;
+}
+
+void Products::addRegisteredProduct(int id, const QString &name, int quantity, const QString &image)
+{
+    addProductToModel(new Product(id, name, quantity, image));
 }

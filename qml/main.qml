@@ -5,6 +5,21 @@ import Notifications 1.0
 ApplicationWindow {
     id: applicationWindow
 
+    function openPage(page) {
+        if (stackView.currentItem !== null
+                && ((stackView.currentItem.__type !== undefined
+                     && stackView.currentItem.__type === page)
+                    || stackView.loadedPages.indexOf(page) !== -1)) {
+            console.log("Trying to open a page that is already opened")
+        } else {
+            stackView.push(Qt.resolvedUrl(".") + "/pages/" + page + ".qml")
+        }
+    }
+
+    function goToMainPage() {
+        stackView.pop(Qt.resolvedUrl(".") + "/pages/Products.qml")
+    }
+
     width: 1024
     height: 576
     visible: true
@@ -16,7 +31,7 @@ ApplicationWindow {
             MenuItem {
                 text: qsTr("&Add") + translator.tr
                 shortcut: "ctrl+a"
-                onTriggered: stackView.push(addProductPage)
+                onTriggered: openPage("AddProduct")
             }
         }
 
@@ -25,10 +40,7 @@ ApplicationWindow {
 
             MenuItem {
                 text: qsTr("&Language") + translator.tr
-                onTriggered: {
-                    if (stackView.currentItem.objectName !== "LanguageSelector")
-                        stackView.push(languages)
-                }
+                onTriggered: openPage("LanguageSelector")
             }
         }
     }
@@ -58,6 +70,8 @@ ApplicationWindow {
     StackView {
         id: stackView
 
+        property var loadedPages: []
+
         anchors {
             top: notificationBar.bottom
             bottom: parent.bottom
@@ -66,7 +80,20 @@ ApplicationWindow {
         }
 
         focus: true
-        initialItem: products
+
+        onCurrentItemChanged: {
+            if (currentItem === null)
+                return
+
+            var pages = loadedPages
+
+            if (depth > loadedPages.length)
+                pages.push(currentItem.__type)
+            else if (depth < loadedPages.length)
+                pages.pop()
+
+            loadedPages = pages
+        }
 
         Behavior on y { NumberAnimation { easing.type: Easing.InOutCubic } }
     }
@@ -86,18 +113,5 @@ ApplicationWindow {
         onShowMessage: notificationBar.showMessage(message, type, duration)
     }
 
-    Component {
-        id: products
-        Products { }
-    }
-
-    Component {
-        id: addProductPage
-        AddProductPage { }
-    }
-
-    Component {
-        id: languages
-        LanguageSelector { }
-    }
+    Component.onCompleted: openPage("Products")
 }

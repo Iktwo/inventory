@@ -5,6 +5,7 @@
 #include <QQmlComponent>
 #include <QQmlContext>
 #include <QSettings>
+#include <QDir>
 
 #include "translator.h"
 
@@ -14,6 +15,9 @@
 
 int main(int argc, char *argv[])
 {
+    // QByteArray data = "1";
+    // qputenv("QML_IMPORT_TRACE", data);
+
     QScopedPointer<QApplication> app(new QApplication(argc, argv));
 
     QQmlApplicationEngine engine;
@@ -40,6 +44,10 @@ int main(int argc, char *argv[])
     QSettings settings;
     translator.translate(settings.value("language", "SP").toString());
 
+    QDir imagesDir("images");
+    engine.rootContext()->setContextProperty("imagesDir", imagesDir.absolutePath());
+
+    engine.addImportPath("qrc:/qml/qml");
     engine.load(QUrl("qrc:/qml/qml/main.qml"));
 
     return app->exec();

@@ -1,11 +1,14 @@
 <RCC>
     <qresource prefix="/qml">
         <file>qml/main.qml</file>
-        <file>qml/LanguageSelector.qml</file>
-        <file>qml/Products.qml</file>
-        <file>qml/ProductDetails.qml</file>
         <file>qml/NotificationBar.qml</file>
-        <file>qml/AddProductPage.qml</file>
+        <file>qml/components/ImageDropArea.qml</file>
+        <file>qml/components/Page.qml</file>
+        <file>qml/components/qmldir</file>
+        <file>qml/pages/LanguageSelector.qml</file>
+        <file>qml/pages/Products.qml</file>
+        <file>qml/pages/products/ProductDetails.qml</file>
+        <file>qml/pages/AddProduct.qml</file>
     </qresource>
     <qresource prefix="/sql">
         <file alias="db.sql">resources/data/db.sql</file>

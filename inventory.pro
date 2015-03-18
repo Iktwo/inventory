@@ -12,11 +12,10 @@ RESOURCES += \
     resources.qrc
 
 OTHER_FILES += \
-    qml/main.qml \
-    resources/data/db.sql \
-    qml/LanguageSelector.qml \
-    qml/Products.qml \
-    qml/ProductDetails.qml
+    qml/*.qml \
+    qml/products/*.qml \
+    qml/pages/products/*.qml \
+    resources/data/db.sql
 
 HEADERS += \
     src/dbaccessor.h \
@@ -30,9 +29,16 @@ TRANSLATIONS = \
 
 QMAKE_CXXFLAGS += -std=gnu++11
 
+QML_IMPORT_PATH += qml
+
 DISTFILES += \
-    qml/NotificationBar.qml
+    qml/NotificationBar.qml \
+    qml/CustomDropArea.qml
 
 lupdate_only{
-    SOURCES += qml/*.qml
+    SOURCES += \
+        qml/*.qml \
+        qml/components/*.qml \
+        qml/pages/*.qml \
+        qml/pages/products/*.qml
 }
